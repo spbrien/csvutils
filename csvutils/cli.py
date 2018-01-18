@@ -7,6 +7,7 @@ import click
 
 @click.command()
 def main(args=None):
+    """Console script for csvutils."""
     click.echo("Nothing to see here")
 
 
