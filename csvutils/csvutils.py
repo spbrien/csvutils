@@ -71,7 +71,7 @@ def get_tsv_dict(f):
         )
 
 
-def write_row_splits(splits):
+def write_data_splits(splits):
     for k, v in splits.iteritems():
         with open("%s.tsv" % k, 'w') as out:
             w = csv.writer(out)
@@ -79,7 +79,18 @@ def write_row_splits(splits):
                 w.writerow(v)
 
 
-def create_row_splits(l):
+def write_dict_splits(splits):
+    for k, v in splits.iteritems():
+        with open("%s.tsv" % k, 'w') as out:
+            fieldnames = v[0].keys()
+            w = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            w.writeheader()
+            for i in v:
+                w.writerow(v)
+
+
+def create_splits(l):
     def process_items(items):
         return ({
             name: predicate(item)
@@ -88,11 +99,18 @@ def create_row_splits(l):
     return process_items
 
 
-def split_tsv_by_row(f, condition_list=None):
+def split_tsv(f, condition_list=None, dictionary=False):
     def process(condition_list):
-        split_factory = create_row_splits(condition_list)
-        data = get_tsv_data(f)
+        split_factory = create_splits(condition_list)
+        data = get_tsv_dict(f) if dictionary else get_tsv_data(f)
         splits = split_factory(data)
-        write_row_splits(splits)
+        if dictionary:
+            write_dict_splits(splits)
+        else:
+            write_data_splits(splits)
 
     return process(condition_list) if condition_list else process
+
+
+def split_tsv_dict(f, condition_list=None):
+    return split_tsv(f, condition_list=condition_list, dictionary=True)
