@@ -69,3 +69,31 @@ def get_tsv_dict(f):
                 for key, value in row.iteritems()
             } for row in tsvin if any(row)
         ]
+
+
+def write_row_splits(splits):
+    for k, v in splits.iteritems():
+        with open("%s.tsv" % k, 'w') as out:
+            w = csv.writer(out)
+            for i in v:
+                w.writerow(v)
+
+
+def create_row_splits(l):
+    def process_items(items):
+        return ({
+            name: predicate(item)
+            for name, predicate in l
+        } for item in items)
+    return process_items
+
+
+def split_tsv_by_row(f, condition_list=None):
+    def process(condition_list):
+        split_factory = create_row_splits(condition_list)
+        with open(f,'rU') as tsvin:
+            tsvin = csv.reader(tsvin, dialect=csv.excel_tab)
+            splits = split_factory(tsvin)
+        write_row_splits(splits)
+
+    return process(condition_list) if condition_list else process
