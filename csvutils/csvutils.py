@@ -32,9 +32,14 @@ def uniq_objs(items, attrs):
         for attr in attrs:
             yield item[attr]
 
-    obj_list = [tuple([i for i in get_attrs_from_list(item, attrs)]) for item in items]
+    obj_list = [
+        tuple(
+            [i for i in get_attrs_from_list(item, attrs)]
+        ) for item in items
+    ]
     non_unique_indexes = [
-        idx for idx, item in enumerate(collections.Counter(obj_list).items())
+        idx for idx, item
+        in enumerate(collections.Counter(obj_list).items())
         if item[1] > 1
     ]
     for item in non_unique_indexes:
